@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,15 +32,15 @@ public class TextEditor extends JFrame {
 
 
         // Doing text field scrolled
-        JScrollPane scollableTextArea = new JScrollPane(textArea);
-        scollableTextArea.setName("ScrollPane");
+        JScrollPane scrollableTextArea = new JScrollPane(textArea);
+        scrollableTextArea.setName("ScrollPane");
         // Indicate that the scroll will always be
-        scollableTextArea.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollableTextArea.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollableTextArea.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 
         // Collect all panels for display on the screen
-        container.add(scollableTextArea, BorderLayout.CENTER);
+        container.add(scrollableTextArea, BorderLayout.CENTER);
         container.add(upArea(), BorderLayout.NORTH);
 
 
