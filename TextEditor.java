@@ -2,6 +2,7 @@ package editor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,8 +12,11 @@ import java.nio.file.Paths;
 public class TextEditor extends JFrame {
     final int WIDTH = 800;
     final int HEIGHT = 800;
-    JTextArea textArea;
-    Container container;
+    private final JTextArea textArea;
+    private final Container container;
+    private JButton saveButton;
+    private JButton loadButton;
+    private JTextField filenameField;
 
     public TextEditor() {
         super("Text Editor");
@@ -43,6 +47,8 @@ public class TextEditor extends JFrame {
         container.add(scrollableTextArea, BorderLayout.CENTER);
         container.add(upArea(), BorderLayout.NORTH);
 
+        createListener();
+        menuBar();
 
         // Display window on the screen
         setVisible(true);
@@ -53,43 +59,84 @@ public class TextEditor extends JFrame {
     private JPanel upArea() {
         JPanel upArea = new JPanel();
         upArea.setLayout(new FlowLayout(FlowLayout.CENTER));
-        JTextField fileNameField = new JTextField(30);
-        fileNameField.setName("FilenameField");
+        filenameField = new JTextField(30);
+        filenameField.setName("FilenameField");
 
-
-        // Saving in a file
-        JButton saveButton = new JButton("Save");
+        // Create a SAVE button. Listener in a separate method.
+        saveButton = new JButton("Save");
         saveButton.setName("SaveButton");
-        saveButton.addActionListener(actionEvent -> {
-            File file = new File(fileNameField.getText());
 
-            try (FileWriter fileWriter = new FileWriter(file)){
-                fileWriter.write(textArea.getText());
+        // Create a LOAD button. Listener in a separate method.
+        loadButton = new JButton("Load");
+        loadButton.setName("LoadButton");
+
+        // Collect the panel from the name input field and 2 buttons
+        upArea.add(filenameField);
+        upArea.add(saveButton);
+        upArea.add(loadButton);
+
+        return upArea;
+    }
+
+
+    // Putting all listeners in one place
+    public void createListener() {
+
+        // For operations SAVE
+        saveButton.addActionListener(actionEvent -> {
+            File file = new File(filenameField.getText());
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(textArea.getText());
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(container,
-                        "ERROR!\nНевозможно создать файл:\n " + fileNameField.getText());
+                        "ERROR!\nНевозможно создать файл:\n " + filenameField.getText());
             }
         });
 
-
-        // Loading a file with a name in a text field
-        JButton loadButton = new JButton("Load");
-        loadButton.setName("LoadButton");
+        // For operations LOAD
         loadButton.addActionListener(actionEvent -> {
             try {
-                textArea.setText(new String(Files.readAllBytes(Paths.get(fileNameField.getText()))));
+                textArea.setText(new String(Files.readAllBytes(Paths.get(filenameField.getText()))));
             } catch (IOException e) {
                 textArea.setText(null);
             }
         });
+    }
+
+    public void menuBar() {
+        // Creating menu's line
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+
+        // Creating menu FILE
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setName("MenuFile");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        menuBar.add(fileMenu);
+
+        // Create a LOAD clause with a mnemonic and take the listener from the LOAD button
+        JMenuItem loadMenuItem = new JMenuItem("Load");
+        loadMenuItem.setName("MenuLoad");
+        loadMenuItem.addActionListener(loadButton.getActionListeners()[0]);
+        loadMenuItem.setMnemonic(KeyEvent.VK_L);
 
 
-        // Collect a panel from name's input field and 2 buttons
-        upArea.add(fileNameField);
-        upArea.add(saveButton);
-        upArea.add(loadButton);
+        // Create a SAVE item with a mnemonic command and take a listener from the SAVE button
+        JMenuItem saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.setName("MenuSave");
+        saveMenuItem.setMnemonic(KeyEvent.VK_S);
+        saveMenuItem.addActionListener(saveButton.getActionListeners()[0]);
 
+        // Create an EXIT item with a mnemonic code and a safe exit
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setName("MenuExit");
+        exitMenuItem.setMnemonic(KeyEvent.VK_E);
+        exitMenuItem.addActionListener(actionEvent -> dispose());
 
-        return upArea;
+        // Add items to the menu
+        fileMenu.add(loadMenuItem);
+        fileMenu.add(saveMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitMenuItem);
     }
 }
